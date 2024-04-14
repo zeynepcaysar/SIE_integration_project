@@ -2,12 +2,7 @@
 
 # HOW TO MAKE IT WORK
 you send an order message with send_smtp.py file.
-and then you parse the email with parse.py file.
-it shows you the result: order accepted or not regarding stock or product availability. 
-
-
-
-
+and then time.py function checks every 1 minute if there is a new email. it goes to the parse.py file that shows you the result: order accepted or not regarding stock or product availability. 
 
 
 # FILES

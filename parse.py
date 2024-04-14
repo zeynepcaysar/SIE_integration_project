@@ -180,4 +180,4 @@ def process_emails(directory):
         print("No emails found in the directory.")
 
 # Example usage, point to the directory containing your .eml files
-process_emails('/Users/zeynepcaysar/Downloads/FakeSMTP-master/target/received-emails')
+#process_emails('/Users/zeynepcaysar/Downloads/FakeSMTP-master/target/received-emails')
