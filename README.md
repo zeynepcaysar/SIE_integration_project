@@ -1,6 +1,20 @@
 # sie_integration_project
 
-# HOW TO MAKE IT WORK
+# needed softwares: 
+Python: For scripting the automation process.
+
+FakeSMTP: Used during development to test email capturing without needing real email traffic.
+
+Odoo ERP: Central management software that handles CRM, sales, and inventory.
+
+SpaCy: Natural Language Processing library to parse email content effectively.
+
+Odoo API: RESTful API for accessing and manipulating Odoo's database, particularly for creating and updating CRM records, checking inventory, and processing sales orders.
+
+SMTP Protocol: Used for sending confirmation emails through the Python smtplib.
+
+
+# HOW TO MAKE THE CODE WORK 
 you send an order message with send_smtp.py file.
 and then time.py function checks every 1 minute if there is a new email. it goes to the parse.py file that shows you the result: order accepted or not regarding stock or product availability. 
 
