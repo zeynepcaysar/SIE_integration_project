@@ -21,7 +21,7 @@ common = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/common')
 uid = common.authenticate(db, username, password, {})
 models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
 
-
+#function to parse emails with NLP
 def parse_email(file_path):
     with open(file_path, 'rb') as file:  # Read as binary to handle different encodings
         msg = BytesParser(policy=policy.default).parse(file)
@@ -54,7 +54,7 @@ def parse_email(file_path):
 
         return order_details
 
-
+#function to check if the customer is a new or existiong one
 def check_or_create_partner(email):
     # Convert email address to string if it's not already
     email_str = str(email)
@@ -70,6 +70,7 @@ def check_or_create_partner(email):
         }])
 
 
+#function to fix the date format
 def format_date(date_str):
     # Clean the date string to ensure no extraneous text is included
     cleaned_date_str = date_str.split('\n')[0].strip()  # Taking the first part before any newline and trimming spaces
@@ -79,7 +80,7 @@ def format_date(date_str):
         print(f"Date formatting error: {e}, with input: {cleaned_date_str}")
         return None
 
-
+#function to check if the product is available and the stocks are sufficient or not. 
 def check_product_availability(product_id, quantity_needed, customer_email):
     product_id = int(product_id)
     quantity_needed = int(quantity_needed)
@@ -101,6 +102,7 @@ def check_product_availability(product_id, quantity_needed, customer_email):
 
     return True, "Available"
 
+#function to send email to customer
 def send_email(subject, message, from_addr, to_addr):
     msg = MIMEMultipart()
     msg['From'] = from_addr
@@ -115,6 +117,7 @@ def send_email(subject, message, from_addr, to_addr):
     server.quit()
     print("Email sent to", to_addr)
 
+#function to create order in odoo
 def create_odoo_order(order_details):
     if order_details is None:
         return  # Exit if no order details found
@@ -155,7 +158,7 @@ def create_odoo_order(order_details):
         print("Failed to create order.")
 
 
-
+#function to process order
 def process_emails(directory):
     # Initialize variables to find the latest file
     latest_file = None
@@ -179,5 +182,5 @@ def process_emails(directory):
     else:
         print("No emails found in the directory.")
 
-# Example usage, point to the directory containing your .eml files
+
 #process_emails('/Users/zeynepcaysar/Downloads/FakeSMTP-master/target/received-emails')

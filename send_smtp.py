@@ -7,7 +7,7 @@ def send_email(subject, message, from_addr, to_addr):
     msg['From'] = from_addr
     msg['To'] = to_addr
 
-    # Connect to your local FakeSMTP server
+    # Connect to FakeSMTP server
     server = smtplib.SMTP('localhost', 25)  # Default SMTP port is 25
     server.send_message(msg)
     server.quit()
