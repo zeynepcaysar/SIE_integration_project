@@ -42,6 +42,7 @@ send_email(email_subject, email_body, 'customer1020@example.com', 'sales@mycompa
 
 
 #reply: insufficient stocks
+
 #answer 1: order other available products
 '''
 email_subject = "reply: insufficient stocks"

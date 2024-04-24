@@ -17,80 +17,8 @@ after python and fakesmtp is installed, to test the code:
 
 # HOW TO MAKE THE CODE WORK 
 to test the customer-company email interaction, first like a customer does, send an order message with send_smtp.py file. you can send multiple mails. Also, you can send multiple orders in one mail. 
-here below, you can find correct format of an exemple with multiple orders:
+try commented exemples in the send_smpty.py to see different results.
 
-#starts
-
-email_subject = "New Order Confirmation"
-email_body = """
-Hello, this is my order below,
-#successful order
-- address:chemin de soleil, 1223, Geneva
-- Order Date: April 16, 2024
-- Delivery Date: April 28, 2024
-- Product ID: 21
-- Quantity: 2
-#insufficient stocks
-- Order Date: April 16, 2024
-- Delivery Date: April 28, 2024
-- Product ID: 5
-- Quantity: 1
-#product unavailable 
-- Order Date: April 16, 2024
-- Delivery Date: April 28, 2024
-- Product ID: 1
-- Quantity: 1
-
-Thank you,
-Best Regards,
-"""
-
-send_email(email_subject, email_body, 'customer1020@example.com', 'sales@mycompany.com')
-
-#ends
-
-to test another form of email, which is a reply from a customer to insufficient stocks message, here below, you can find correct format of a reply mail:
-
-#starts
-
-email_subject = "reply: insufficient stocks"
-email_body = """
-1
-- address:chemin de soleil, 1223, Geneva
-- Order Date: April 16, 2024
-- Delivery Date: April 28, 2024
-- Product ID: 21
-- Quantity: 2
-"""
-send_email(email_subject, email_body, 'customer1020@example.com', 'sales@mycompany.com')
-
-#ends
-
-or 
-
-#starts
-
-email_subject = "reply: insufficient stocks"
-email_body = """
-2
-product id: 5
-quantity:2
-"""
-send_email(email_subject, email_body, 'customer1020@example.com', 'sales@mycompany.com')
-
-#ends
-
-or 
-
-#starts
-
-email_subject = "reply: insufficient stocks"
-email_body = """
-3
-"""
-send_email(email_subject, email_body, 'customer1020@example.com', 'sales@mycompany.com')
-
-#ends
 
 THEN, run time.py file who checks every 1 minute if there are any new email. if you run time.py file, make sure that process_emails function at the bottom of the parse.py file is commented. 
 to gain 1 minute, you can simply run the parse.py. 
