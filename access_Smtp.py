@@ -1,7 +1,7 @@
 import os
 import email
 from email import policy
-
+#accessing mails
 def read_emails(directory):
     for filename in os.listdir(directory):
         if filename.endswith('.eml'):
@@ -14,5 +14,5 @@ def read_emails(directory):
                 print('Body:', msg.get_body(preferencelist=('plain', 'html')).get_content())
                 print('----')
 
-# Example usage
+
 read_emails('/Users/zeynepcaysar/Downloads/FakeSMTP-master/target/received-emails')
