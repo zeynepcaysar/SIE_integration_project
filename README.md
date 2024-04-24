@@ -13,14 +13,93 @@ Odoo API: RESTful API for accessing and manipulating Odoo's database, particular
 
 SMTP Protocol: Used for sending confirmation emails through the Python smtplib.
 
+after python and fakesmtp is installed, to test the code:
 
 # HOW TO MAKE THE CODE WORK 
-you send an order message with send_smtp.py file.
-then, run time.py file who checks every 1 minute if there is a new email. it goes to the parse.py file that shows you the result: order accepted(created order in odoo) or not regarding stock or product availability. Then, a mail sent to customer with the order information, whether accepted or not.
+to test the customer-company email interaction, first like a customer does, send an order message with send_smtp.py file. you can send multiple mails. Also, you can send multiple orders in one mail. 
+here below, you can find correct format of an exemple with multiple orders:
+
+#starts
+
+email_subject = "New Order Confirmation"
+email_body = """
+Hello, this is my order below,
+#successful order
+- address:chemin de soleil, 1223, Geneva
+- Order Date: April 16, 2024
+- Delivery Date: April 28, 2024
+- Product ID: 21
+- Quantity: 2
+#insufficient stocks
+- Order Date: April 16, 2024
+- Delivery Date: April 28, 2024
+- Product ID: 5
+- Quantity: 1
+#product unavailable 
+- Order Date: April 16, 2024
+- Delivery Date: April 28, 2024
+- Product ID: 1
+- Quantity: 1
+
+Thank you,
+Best Regards,
+"""
+
+send_email(email_subject, email_body, 'customer1020@example.com', 'sales@mycompany.com')
+
+#ends
+
+to test another form of email, which is a reply from a customer to insufficient stocks message, here below, you can find correct format of a reply mail:
+
+#starts
+
+email_subject = "reply: insufficient stocks"
+email_body = """
+1
+- address:chemin de soleil, 1223, Geneva
+- Order Date: April 16, 2024
+- Delivery Date: April 28, 2024
+- Product ID: 21
+- Quantity: 2
+"""
+send_email(email_subject, email_body, 'customer1020@example.com', 'sales@mycompany.com')
+
+#ends
+
+or 
+
+#starts
+
+email_subject = "reply: insufficient stocks"
+email_body = """
+2
+product id: 5
+quantity:2
+"""
+send_email(email_subject, email_body, 'customer1020@example.com', 'sales@mycompany.com')
+
+#ends
+
+or 
+
+#starts
+
+email_subject = "reply: insufficient stocks"
+email_body = """
+3
+"""
+send_email(email_subject, email_body, 'customer1020@example.com', 'sales@mycompany.com')
+
+#ends
+
+THEN, run time.py file who checks every 1 minute if there are any new email. if you run time.py file, make sure that process_emails function at the bottom of the parse.py file is commented. 
+to gain 1 minute, you can simply run the parse.py. 
+check the results in fakesmtp's received emails folder. 
+in a successful order case, check the orders in odoo, and also check customers. 
 
 
 # FILES
-- odoo_api.py file access to odoo
-- access_Smtp.py file reads emails in received emails folder of fakesmtp
-- parse.py file starts with function process_emails with the directory to email folder. and then it searchs for latest email. it goes to the function create_odoo_order where it checks product availability check_product_availability function. it says available or not and send confirmation email to the customer with send_email function. after, it checks if the customer is a new or existing one. after the order cretated, it the order creation, a new confirmation email sent to customer. 
-- send_smtp.py file sends email via fakesmtp
+- parse.py file : MAIN FUNCTION THAT DOES THE WORK FOR AUTOMATIC EMAIL INTERACTION AND CREATING AN ORDER IN ODOO.
+- send_smtp.py file : sends email via fakesmtp
+- odoo_api.py file : access to odoo
+- access_Smtp.py file : reads emails in received emails folder of fakesmtp
