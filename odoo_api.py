@@ -5,16 +5,13 @@ db = 'sie'
 username = 'zeynepcaysar2019@gmail.com'
 password = '1234'
 
-# Setup common and models server proxy
 common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(url))
 models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))
 
-# Authenticate
 uid = common.authenticate(db, username, password, {})
 if uid:
     print("Authentication success.")
 
-    # Execute operation after successful authentication
     try:
         # Fetch product information
         products = models.execute_kw(db, uid, password,
