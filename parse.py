@@ -28,15 +28,14 @@ def extract_order_details(order_text, customer_email):
         'quantity': None,
         'address': None
     }
-
     for line in order_text.split('\n'):
         line = line.strip()
         if line.startswith('-'):
-            line = line[1:].strip()  # Remove leading hyphen
+            line = line[1:].strip()
 
         key, sep, value = line.partition(':')
-        if sep:  # Check if the line contains a separator
-            key = key.strip().lower()  # Normalize the key to lower case
+        if sep:
+            key = key.strip().lower()
             value = value.strip()
 
             mapping = {
@@ -50,7 +49,7 @@ def extract_order_details(order_text, customer_email):
             if normalized_key:
                 order_details[normalized_key] = value
 
-    if all(order_details[key] for key in ['order_date', 'delivery_date', 'product_id', 'quantity'] if key in order_details):  # Check required fields
+    if all(order_details[key] for key in ['order_date', 'delivery_date', 'product_id', 'quantity'] if key in order_details):
         return order_details
     else:
         #print("Incomplete Order Details:", order_details)
@@ -60,24 +59,22 @@ def extract_order_details(order_text, customer_email):
 def extract_body(msg):
     if msg.is_multipart():
         for part in msg.walk():
-            # Check if the part is text/plain and not an attachment
             if part.get_content_type() == 'text/plain' and not part.get('Content-Disposition'):
                 return part.get_payload(decode=True).decode('utf-8', errors='ignore')
     else:
-        # If not multipart, directly decode the payload
         return msg.get_payload(decode=True).decode('utf-8', errors='ignore')
 
-    return ""  # Return an empty string if no suitable part was found
+    return ""
 
 
 def parse_email(msg, file_path):
-    from_email = str(msg.get('From')).lower()  # Convert and normalize email to lower case
-    subject = str(msg.get('Subject', '')).lower()  # Safely extract and normalize the subject
+    from_email = str(msg.get('From')).lower()
+    subject = str(msg.get('Subject', '')).lower()
 
     if "noreply@mycompany.com" in from_email or "sales@mycompany.com" in from_email:
-        return []  # Skip processing for these addresses
+        return []  # skip processing for these addresses
 
-    body = extract_body(msg)  # Use the previously defined function to extract body
+    body = extract_body(msg)
     if not body:
         print("No text content could be extracted from:", file_path)
         return []
@@ -86,7 +83,7 @@ def parse_email(msg, file_path):
         return handle_stock_reply(body, from_email)
 
     orders = []
-    order_texts = body.split("\n\n")  # Assume each order is separated by two newlines
+    order_texts = body.split("\n\n")
     for order_text in order_texts:
         order_details = extract_order_details(order_text, from_email)
         if order_details:
@@ -96,14 +93,13 @@ def parse_email(msg, file_path):
 
     return orders
 
+
 def handle_stock_reply(body, from_email):
     lines = body.strip().split('\n')
     if not lines:
         send_email("Error in Stock Reply", "No response detected.", "sales@mycompany.com", from_email)
         return
-
     response = lines[0].strip()
-
     try:
         if response == '2':
             product_id = int(lines[1].split(':')[1].strip())
@@ -117,7 +113,6 @@ def handle_stock_reply(body, from_email):
                        "We have canceled your order as per your request.",
                        "sales@mycompany.com", from_email)
         elif response == '1':
-            # Parse additional order details starting from the second line
             order_details = extract_order_details_from_response(lines[1:], from_email)
             if order_details and create_odoo_order(order_details):
                 send_email("Order Processing Confirmed",
@@ -137,24 +132,19 @@ def handle_stock_reply(body, from_email):
 
 
 def extract_order_details_from_response(lines, customer_email):
-    """ Extract order details from lines of text assuming they follow a specific pattern """
     order_details = {'customer_email': customer_email}
     for line in lines:
-        # Strip any leading hyphen and spaces to clean up the line before splitting
         clean_line = line.strip().lstrip('-').strip()
         key, _, value = clean_line.partition(':')
-        # Normalize the key to use in the dictionary (lowercase and replace spaces with underscores)
         normalized_key = key.strip().lower().replace(' ', '_')
         if normalized_key in ['address', 'order_date', 'delivery_date', 'product_id', 'quantity']:
             order_details[normalized_key] = value.strip()
 
-    # Check that all required fields are present and attempt to format the dates
     required_fields = ['order_date', 'delivery_date', 'product_id', 'quantity', 'address']
     if all(order_details.get(field) for field in required_fields):
         try:
             order_details['order_date'] = format_date(order_details['order_date'])
             order_details['delivery_date'] = format_date(order_details['delivery_date'])
-            # Check if both dates are successfully formatted
             if order_details['order_date'] and order_details['delivery_date']:
                 return order_details
         except ValueError as e:
@@ -166,6 +156,7 @@ def extract_order_details_from_response(lines, customer_email):
 def notify_supplier(product_id, quantity, from_email):
     message = f"We need more stock for Product ID {product_id}, Quantity Required: {quantity}. Please confirm availability."
     send_email("Request for Product Replenishment", message, "sales@mycompany.com", "supplier@example.com")
+
 
 def process_order(order_details, from_email):
     order_date = format_date(order_details['order_date'])
@@ -179,7 +170,6 @@ def process_order(order_details, from_email):
     order_details['delivery_date'] = delivery_date
     if create_odoo_order(order_details):
         send_email("Order Confirmation", f"Dear Customer,\n\nYour order with product ID {order_details['product_id']} was successfully processed.\n\nBest Regards.", "sales@mycompany.com", from_email)
-
 
 
 def send_email(subject, message, from_addr, to_addr):
@@ -199,7 +189,6 @@ def create_odoo_order(order_details):
                                                                          order_details['quantity'],
                                                                          order_details['customer_email'])
 
-
     if not product_available:
         print(availability_message)
         return False  # Stop further processing since the product isn't available
@@ -208,8 +197,6 @@ def create_odoo_order(order_details):
     if not partner_id:
         print("Failed to find or create a partner with the email:", order_details['customer_email'])
         return False
-
-
 
     # Creating the order in Odoo
     order_id = models.execute_kw(db, uid, password, 'sale.order', 'create', [{
@@ -224,7 +211,6 @@ def create_odoo_order(order_details):
 
     if order_id:
         print(f"Created sales order with ID: {order_id}")
-        #notify_customer_of_issue(order_details['customer_email'],"Your order with ID {} has been successfully created and will be processed soon.".format( order_id))
         return order_id
     else:
         print("Failed to create the order in Odoo.")
@@ -352,7 +338,7 @@ def update_last_run_time(file_path, current_time):
     with open(file_path, 'w') as file:
         file.write(current_time.isoformat())
 
-# Example usage
+#when time.py is used, comment the bottom line
 process_emails('/Users/zeynepcaysar/Downloads/FakeSMTP-master/target/received-emails', '/Users/zeynepcaysar/PycharmProjects/SIE2024/last_run_time.txt')
 
 
